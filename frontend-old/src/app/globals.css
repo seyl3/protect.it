@@ -1,0 +1,86 @@
+@import "tailwindcss";
+
+/* Faith Collapsing Custom Font */
+@font-face {
+  font-family: 'Faith Collapsing';
+  src: url('/fonts/Faith Collapsing.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-faith: 'Faith Collapsing', sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Custom class for Faith Collapsing font */
+.font-faith {
+  font-family: 'Faith Collapsing', sans-serif;
+}
+
+/* Navigation link hover effect with new theme color */
+.nav-link-hover {
+  transition: color 0.3s;
+}
+
+.nav-link-hover:hover {
+  color: #00FA9A !important;
+}
+
+/* Custom button styles for new theme color */
+button[data-testid="rk-connect-button"] {
+  color: #000 !important;
+  background-color: #00FA9A !important;
+  border: none !important;
+  transition: all 0.3s !important;
+}
+
+button[data-testid="rk-connect-button"]:hover {
+  opacity: 0.9 !important;
+  transform: scale(1.05) !important;
+}
+
+button[data-testid="rk-account-button"] {
+  color: #000 !important;
+  background-color: #00FA9A !important;
+  border: none !important;
+  transition: all 0.3s !important;
+}
+
+button[data-testid="rk-account-button"]:hover {
+  opacity: 0.9 !important;
+  transform: scale(1.05) !important;
+}
+
+/* Glass navigation hover effect */
+.glass-nav-hover {
+  transition: all 0.3s;
+}
+
+.glass-nav-hover:hover {
+  backdrop-filter: blur(20px) !important;
+  background-color: rgba(0, 250, 154, 0.1) !important;
+  border-bottom-color: rgba(0, 250, 154, 0.3) !important;
+}
