@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useWriteContract, useWaitForTransactionReceipt, useReadContract } from 'wagmi';
 import { FACTORY_ADDRESS } from '../../lib/wallet';
 import factoryAbi from '../../abi/PredictionMarketFactory.json';
@@ -231,6 +231,7 @@ export default function CreateMarket() {
                       required
                     >
                       <option value="">Select a protocol</option>
+                      {/* @ts-ignore */}
                       {supportedProtocols && Array.isArray(supportedProtocols) && supportedProtocols.map((protocolName: string) => (
                         <option key={protocolName} value={protocolName}>
                           {protocolName}
