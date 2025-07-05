@@ -84,3 +84,19 @@ button[data-testid="rk-account-button"]:hover {
   background-color: rgba(0, 250, 154, 0.1) !important;
   border-bottom-color: rgba(0, 250, 154, 0.3) !important;
 }
+
+/* Custom animations */
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out;
+}

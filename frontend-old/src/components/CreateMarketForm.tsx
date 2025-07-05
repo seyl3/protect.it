@@ -2,14 +2,17 @@
 
 import React, { useState, useEffect } from 'react';
 import { useWriteContract, useWaitForTransactionReceipt, useReadContract } from 'wagmi';
+import { useRouter } from 'next/navigation';
 import { FACTORY_ADDRESS } from '../lib/wallet';
 import factoryAbi from '../abi/PredictionMarketFactory.json';
 
 export default function CreateMarketForm() {
+  const router = useRouter();
   const [protocol, setProtocol] = useState('');
   const [duration, setDuration] = useState<number>(30);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [transactionError, setTransactionError] = useState<Error | null>(null);
+  const [deployedMarketAddress, setDeployedMarketAddress] = useState<string | null>(null);
 
   // Get supported protocols from contract
   const { data: supportedProtocols } = useReadContract({
@@ -37,16 +40,39 @@ export default function CreateMarketForm() {
     hash,
   });
 
-  // Handle transaction states
+  // Handle transaction states and get deployed market address
   useEffect(() => {
-    if (isConfirmed) {
+    if (isConfirmed && hash) {
       setIsSubmitting(false);
       setTransactionError(null);
+      
+      // Fetch the deployed market address from the latest market
+      const fetchDeployedAddress = async () => {
+        try {
+          // Wait a bit for the blockchain to update
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          
+          // Get all markets from the factory
+          const response = await fetch('/api/markets');
+          if (response.ok) {
+            const markets = await response.json();
+            if (markets && markets.length > 0) {
+              // Get the most recent market (should be the one we just deployed)
+              const latestMarket = markets[0];
+              setDeployedMarketAddress(latestMarket.market);
+            }
+          }
+        } catch (error) {
+          console.error('Error fetching deployed market address:', error);
+        }
+      };
+      
+      fetchDeployedAddress();
     } else if (confirmError) {
       setTransactionError(confirmError instanceof Error ? confirmError : new Error(String(confirmError)));
       setIsSubmitting(false);
     }
-  }, [isConfirmed, confirmError]);
+  }, [isConfirmed, confirmError, hash]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -113,7 +139,7 @@ export default function CreateMarketForm() {
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
               </div>
-              <div className="ml-3">
+              <div className="ml-3 flex-1">
                 <h3 className="text-sm font-medium text-[#00FA9A]">Market Created Successfully!</h3>
                 <div className="mt-2 text-sm text-[#00FA9A]">
                   <p>Your insurance market has been deployed on Flow EVM.</p>
@@ -145,6 +171,18 @@ export default function CreateMarketForm() {
                       </a>
                     </div>
                   </div>
+                  
+                  {/* Go to Market Button */}
+                  {deployedMarketAddress && (
+                    <div className="mt-4">
+                      <button
+                        onClick={() => router.push(`/market/${deployedMarketAddress}`)}
+                        className="bg-[#00FA9A] text-black py-2 px-6 rounded-lg font-bold hover:bg-[#00FA9A]/80 transition-all duration-300 transform hover:scale-105 shadow-lg"
+                      >
+                        Go to Market →
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
