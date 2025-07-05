@@ -231,7 +231,7 @@ export default function CreateMarket() {
                       required
                     >
                       <option value="">Select a protocol</option>
-                      {/* @ts-ignore */}
+                      {/* @ts-expect-error - supportedProtocols type is unknown from contract call */}
                       {supportedProtocols && Array.isArray(supportedProtocols) && supportedProtocols.map((protocolName: string) => (
                         <option key={protocolName} value={protocolName}>
                           {protocolName}

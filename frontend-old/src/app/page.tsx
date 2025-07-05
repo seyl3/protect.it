@@ -42,7 +42,7 @@ export default function Home() {
                 <circle cx="20" cy="12" r="2"/>
                 <circle cx="12" cy="4" r="1"/>
                 <circle cx="12" cy="20" r="1"/>
-              </svg>
+                    </svg>
               <h3 className="font-faith text-2xl font-bold text-black">Decentralized</h3>
             </div>
             <p className="text-black text-base leading-relaxed">Community-powered insurance system.</p>
@@ -51,7 +51,7 @@ export default function Home() {
             <div className="flex items-center mb-4">
               <svg className="w-8 h-8 mr-4 text-black" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
-              </svg>
+                    </svg>
               <h3 className="font-faith text-2xl font-bold text-black">Transparent</h3>
             </div>
             <p className="text-black text-base leading-relaxed">On-chain data and staking pools visible to all.</p>
@@ -62,7 +62,7 @@ export default function Home() {
                 <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                 <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" strokeWidth="1"/>
                 <path d="M12 8v8M8 12h8" stroke="currentColor" strokeWidth="1"/>
-              </svg>
+                    </svg>
               <h3 className="font-faith text-2xl font-bold text-black">Prediction-Based</h3>
             </div>
             <p className="text-black text-base leading-relaxed">Risk evaluated by collective market sentiment.</p>

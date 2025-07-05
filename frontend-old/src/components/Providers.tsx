@@ -194,7 +194,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   // Prevent SSR issues by not rendering wallet providers until client-side
   if (!mounted) {
-    return (
+  return (
       <QueryClientProvider client={queryClient}>
         <div suppressHydrationWarning>
           {children}
@@ -211,7 +211,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <QueryClientProvider client={queryClient}>
         <WagmiProvider config={wagmiConfig}>
           <AppContent>{children}</AppContent>
-        </WagmiProvider>
+    </WagmiProvider>
       </QueryClientProvider>
     </PrivyProvider>
   );
