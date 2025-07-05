@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { ArrowTopRightOnSquareIcon, ClipboardDocumentIcon, CheckIcon } from '@heroicons/react/24/outline';
 import { flowEvmApi, type ContractData } from '../lib/flowEvmApi';
 
@@ -17,11 +17,7 @@ export default function ContractInfo({ address, name, description, className = '
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchContractInfo();
-  }, [address]);
-
-  const fetchContractInfo = async () => {
+  const fetchContractInfo = useCallback(async () => {
     if (!address) {
       setError('No address provided');
       setLoading(false);
@@ -42,7 +38,11 @@ export default function ContractInfo({ address, name, description, className = '
     } finally {
       setLoading(false);
     }
-  };
+  }, [address]);
+
+  useEffect(() => {
+    fetchContractInfo();
+  }, [fetchContractInfo]);
 
   const copyAddress = async () => {
     try {

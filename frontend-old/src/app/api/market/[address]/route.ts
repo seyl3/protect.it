@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
-import { createPublicClient, http, parseAbiItem } from 'viem';
+import { createPublicClient, http } from 'viem';
 import { defineChain } from 'viem';
-import factoryAbi from '../../../../abi/PredictionMarketFactory.json';
 import marketAbi from '../../../../abi/PredictionMarket.json';
 
 // Define Flow EVM Mainnet

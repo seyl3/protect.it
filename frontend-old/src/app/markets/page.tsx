@@ -181,7 +181,7 @@ export default function MarketsPage() {
               ].map(({ key, label }) => (
                 <button
                   key={key}
-                  onClick={() => setFilter(key as any)}
+                  onClick={() => setFilter(key as 'all' | 'active' | 'expired' | 'resolved')}
                   className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                     filter === key
                       ? 'bg-[#00FA9A] text-black'
@@ -212,7 +212,7 @@ export default function MarketsPage() {
               <p className="text-gray-600 text-lg">No markets found</p>
             </div>
           ) : (
-            filteredMarkets.map((market, index) => {
+            filteredMarkets.map((market) => {
               const marketData = getMarketData(market);
               
               return (

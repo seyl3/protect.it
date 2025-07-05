@@ -114,7 +114,6 @@ export default function MarketPage() {
   const [amount, setAmount] = useState('');
   const [needsApproval, setNeedsApproval] = useState(false);
   const [marketInfo, setMarketInfo] = useState<MarketInfo | null>(null);
-  const [isLoadingMarket, setIsLoadingMarket] = useState(true);
 
   const marketAddress = params.address as `0x${string}`;
 
@@ -122,7 +121,6 @@ export default function MarketPage() {
   useEffect(() => {
     const fetchMarketInfo = async () => {
       try {
-        setIsLoadingMarket(true);
         console.log('Fetching market info for:', marketAddress);
         
         const response = await fetch(`/api/market/${marketAddress}`);
@@ -135,8 +133,6 @@ export default function MarketPage() {
         }
       } catch (error) {
         console.error('Error fetching market info:', error);
-      } finally {
-        setIsLoadingMarket(false);
       }
     };
 
