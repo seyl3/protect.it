@@ -231,12 +231,13 @@ export default function CreateMarket() {
                       required
                     >
                       <option value="">Select a protocol</option>
-                      {/* @ts-expect-error - supportedProtocols type is unknown from contract call */}
-                      {supportedProtocols && Array.isArray(supportedProtocols) && supportedProtocols.map((protocolName: string) => (
-                        <option key={protocolName} value={protocolName}>
-                          {protocolName}
-                        </option>
-                      ))}
+                      {supportedProtocols && Array.isArray(supportedProtocols) && 
+                        (supportedProtocols as string[]).map((protocolName: string) => (
+                          <option key={protocolName} value={protocolName}>
+                            {protocolName}
+                          </option>
+                        ))
+                      }
                     </select>
                     <p className="mt-1 text-xs text-gray-500">
                       Protocols loaded from smart contract
