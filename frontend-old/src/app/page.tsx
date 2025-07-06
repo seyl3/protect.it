@@ -32,8 +32,8 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Features - Left aligned */}
-        <div className="w-full max-w-6xl flex flex-col md:flex-row gap-10 justify-start mb-20 px-8">
+        {/* Features - Spread equally */}
+        <div className="w-full max-w-6xl flex flex-col md:flex-row gap-10 justify-between items-stretch mb-20 px-8">
           <div className="flex-1 bg-white bg-opacity-40 backdrop-blur-md rounded-2xl p-10 border-2 border-black shadow-2xl shadow-white/50 text-left hover:bg-white hover:bg-opacity-60 transition-all duration-300 transform hover:scale-105 hover:-translate-y-2 cursor-pointer" style={{filter: 'drop-shadow(0 0 25px rgba(255,255,255,0.4))'}}>
             <div className="flex items-center mb-4">
               <svg className="w-8 h-8 mr-4 text-black" fill="currentColor" viewBox="0 0 24 24">
@@ -69,32 +69,36 @@ export default function Home() {
           </div>
         </div>
 
-        {/* About Us - Left aligned */}
-        <div className="w-full max-w-4xl bg-white bg-opacity-50 rounded-2xl p-12 border-2 border-black shadow-2xl shadow-white/50 mb-16 mx-8" style={{filter: 'drop-shadow(0 0 30px rgba(255,255,255,0.5))'}}>
-          <h2 className="text-3xl font-bold text-black mb-4">About Us</h2>
+        {/* How It Works - Match features width */}
+        <div className="w-full max-w-6xl bg-white bg-opacity-50 rounded-2xl p-12 border-2 border-black shadow-2xl shadow-white/50 mb-16 mx-8" style={{filter: 'drop-shadow(0 0 30px rgba(255,255,255,0.5))'}}>
+          <h2 className="font-faith text-4xl font-bold text-black mb-4">how it works</h2>
           <hr className="border-gray-300 mb-8" />
-          <p className="text-black text-lg mb-6 leading-relaxed">
-            <span className="font-semibold">protect.it is a decentralized insurance protocol for Web3.</span>
-          </p>
-          <p className="text-black text-base mb-6 leading-relaxed">
-            It allows users to insure their crypto assets against smart contract hacks using a prediction-based staking system.<br /><br />
-            Instead of relying on centralized insurers, users stake for or against the likelihood of a hack, creating transparent coverage markets backed by collective intelligence.<br /><br />
-            If an exploit is confirmed, payouts are distributed automatically to those who secured coverage.<br /><br />
-            No middlemen. No paperwork. Just smart, trustless protection — governed by the community.
-          </p>
-        </div>
+          
+          {/* Simple explanation for everyone */}
+          <div className="mb-8">
+            <p className="text-black text-lg mb-6 leading-relaxed">
+              <span className="font-semibold">protect.it turns DeFi insurance into a prediction market.</span> Instead of traditional insurance companies deciding coverage and pricing, the community does it through smart contracts.
+            </p>
+            <p className="text-black text-lg mb-6 leading-relaxed">
+              Here's how it works: You can either <span className="font-semibold text-[#00FA9A]">buy insurance</span> against a protocol getting hacked, or <span className="font-semibold text-red-600">bet that it won't</span> get hacked. If you're right, you get paid. If you're wrong, you lose your stake.
+            </p>
+            <p className="text-black text-lg mb-6 leading-relaxed">
+              The magic happens when thousands of people participate - their collective wisdom creates accurate pricing for risk. No insurance company needed. No paperwork. Just transparent, community-driven protection that pays out automatically when hacks happen.
+            </p>
+          </div>
 
-        {/* Technology Used - Left aligned */}
-        <div className="w-full max-w-3xl bg-white bg-opacity-50 rounded-2xl p-12 border-2 border-black shadow-2xl shadow-white/50 mb-12 mx-8" style={{filter: 'drop-shadow(0 0 30px rgba(255,255,255,0.5))'}}>
-          <h2 className="text-3xl font-bold text-black mb-4">Technology Used</h2>
-          <hr className="border-gray-300 mb-8" />
-          <div className="text-black text-lg">
-            <span className="font-semibold">Project Build with:</span>
-            <ul className="list-disc list-inside ml-8 mt-6 text-black text-base space-y-3 leading-relaxed">
-              <li>FLOW Protocol Network</li>
-              <li>Hard Hat</li>
-              <li>Privy</li>
-            </ul>
+          {/* Technical explanation for nerds */}
+          <div className="border-t border-gray-300 pt-8">
+            <h3 className="text-xl font-semibold text-black mb-4">For the Technical Minds</h3>
+            <p className="text-black text-base mb-4 leading-relaxed">
+              <span className="font-semibold">Protocol Architecture:</span> Each insurance market is a dual-token prediction market deployed as an ERC-20 pair (YES/NO tokens) with an automated market maker (AMM) for price discovery. Users mint position tokens by depositing USDC, with token prices reflecting real-time probability assessments of exploit events.
+            </p>
+            <p className="text-black text-base mb-4 leading-relaxed">
+              <span className="font-semibold">Oracle Integration:</span> Hack confirmations are handled through a decentralized oracle system that monitors protocol treasuries, governance announcements, and verified exploit reports. Upon consensus, markets resolve automatically with proportional USDC payouts to winning token holders.
+            </p>
+            <p className="text-black text-base leading-relaxed">
+              <span className="font-semibold">Economic Model:</span> The system leverages prediction market efficiency to price tail risks more accurately than traditional actuarial models. Market participants are incentivized to research and price risk correctly, creating a self-regulating insurance ecosystem with no central authority or underwriting requirements.
+            </p>
           </div>
         </div>
       </div>
