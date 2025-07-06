@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { createPublicClient, http } from 'viem';
 import { defineChain } from 'viem';
 import { FACTORY_ADDRESS } from '../../lib/wallet';
-import factoryAbi from '../../abi/PredictionMarketFactory.json';
+import factoryAbi from '../../abi/PredictionMarketFactoryV2.json';
 import AsciiBackground from '../../components/AsciiBackground';
 
 // Define Flow EVM Mainnet
@@ -37,8 +37,6 @@ const publicClient = createPublicClient({
 
 interface MarketInfo {
   market: string;
-  yesToken: string;
-  noToken: string;
   protocol: string;
   category: string;
   expiry: string;
@@ -46,6 +44,12 @@ interface MarketInfo {
   question: string;
   exists: boolean;
   resolved: boolean;
+  yesPool?: string;
+  noPool?: string;
+  yesSupply?: string;
+  noSupply?: string;
+  totalUsdcDeposited?: string;
+  frozen?: boolean;
 }
 
 export default function MarketsPage() {
@@ -148,13 +152,18 @@ export default function MarketsPage() {
   };
 
   const getMarketData = (market: MarketInfo) => {
-    // For now, using placeholder values - will be replaced with real TVL data
-    const insurePool = 0; // Real TVL for insure side
-    const securePool = 0; // Real TVL for secure side
-    const totalPool = insurePool + securePool;
+    // Use real TVL data from V2 contracts
+    const yesSupply = market.yesSupply ? Number(market.yesSupply) / 1e18 : 0; // Convert from wei to tokens
+    const noSupply = market.noSupply ? Number(market.noSupply) / 1e18 : 0; // Convert from wei to tokens
+    const totalUsdcDeposited = market.totalUsdcDeposited ? Number(market.totalUsdcDeposited) / 1e6 : 0; // Convert from USDC units
     
-    const insurePercent = totalPool > 0 ? Math.round((insurePool / totalPool) * 100) : 0;
-    const securePercent = totalPool > 0 ? Math.round((securePool / totalPool) * 100) : 0;
+    const totalSupply = yesSupply + noSupply;
+    const insurePercent = totalSupply > 0 ? Math.round((yesSupply / totalSupply) * 100) : 50;
+    const securePercent = totalSupply > 0 ? Math.round((noSupply / totalSupply) * 100) : 50;
+    
+    // Calculate approximate pool values based on USDC deposited and token distribution
+    const insurePool = totalUsdcDeposited > 0 ? (yesSupply / totalSupply) * totalUsdcDeposited : 0;
+    const securePool = totalUsdcDeposited > 0 ? (noSupply / totalSupply) * totalUsdcDeposited : 0;
     
     return {
       insurePool: formatTVL(insurePool),
@@ -162,7 +171,7 @@ export default function MarketsPage() {
       insurePercent: `${insurePercent}%`,
       securePercent: `${securePercent}%`,
       progressWidth: `${insurePercent}%`,
-      canInsure: !market.resolved && Number(market.expiry) * 1000 > Date.now()
+      canInsure: !market.resolved && !market.frozen && Number(market.expiry) * 1000 > Date.now()
     };
   };
 

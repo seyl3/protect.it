@@ -205,9 +205,30 @@ export function Providers({ children }: { children: React.ReactNode }) {
     );
   }
 
+  // Debug the environment variable
+  console.log('NEXT_PUBLIC_PRIVY_APP_ID:', process.env.NEXT_PUBLIC_PRIVY_APP_ID);
+  const privyAppId = process.env.NEXT_PUBLIC_PRIVY_APP_ID;
+  
+  if (!privyAppId) {
+    console.error('Privy App ID is not defined in environment variables');
+    return (
+      <QueryClientProvider client={queryClient}>
+        <div suppressHydrationWarning>
+          <div className="fixed inset-0 bg-red-500 text-white flex items-center justify-center z-50">
+            <div className="text-center">
+              <h1 className="text-2xl font-bold mb-4">Configuration Error</h1>
+              <p>Privy App ID is not configured. Please check your environment variables.</p>
+            </div>
+          </div>
+          {children}
+        </div>
+      </QueryClientProvider>
+    );
+  }
+
   return (
     <PrivyProvider 
-      appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID!} 
+      appId={privyAppId} 
       config={privyConfig}
     >
       <QueryClientProvider client={queryClient}>

@@ -13,12 +13,20 @@ interface Pixel {
 
 export default function AsciiBackground() {
   const [pixels, setPixels] = useState<Pixel[]>([]);
+  const [mounted, setMounted] = useState(false);
 
   // Pixel characters for the rain effect
   const pixelChars = ['█', '▓', '▒', '░', '●', '○', '◆', '◇', '■', '□', '▪', '▫'];
 
+  // Ensure component is mounted before using Math.random()
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   // Generate initial pixels
   useEffect(() => {
+    if (!mounted) return;
+    
     const generatePixels = () => {
       const newPixels: Pixel[] = [];
       for (let i = 0; i < 50; i++) {
@@ -35,10 +43,12 @@ export default function AsciiBackground() {
     };
 
     generatePixels();
-  }, []);
+  }, [mounted]);
 
   // Animate pixels falling
   useEffect(() => {
+    if (!mounted) return;
+    
     const interval = setInterval(() => {
       setPixels(prevPixels => 
         prevPixels.map(pixel => {
@@ -66,7 +76,11 @@ export default function AsciiBackground() {
     }, 100); // Update every 100ms for smooth animation
 
     return () => clearInterval(interval);
-  }, [pixelChars]);
+  }, [mounted, pixelChars]);
+
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">

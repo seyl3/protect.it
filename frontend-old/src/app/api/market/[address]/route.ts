@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createPublicClient, http } from 'viem';
 import { defineChain } from 'viem';
-import marketAbi from '../../../../abi/PredictionMarket.json';
+import marketAbi from '../../../../abi/PredictionMarketV2.json';
 
 // Define Flow EVM Mainnet
 const flowEVM = defineChain({
@@ -44,9 +44,7 @@ export async function GET(
       category, 
       question,
       endTime,
-      resolved,
-      yesToken,
-      noToken
+      marketInfo
     ] = await Promise.all([
       publicClient.readContract({
         address: marketAddress as `0x${string}`,
@@ -71,19 +69,24 @@ export async function GET(
       publicClient.readContract({
         address: marketAddress as `0x${string}`,
         abi: marketAbi.abi,
-        functionName: 'resolved',
-      }),
-      publicClient.readContract({
-        address: marketAddress as `0x${string}`,
-        abi: marketAbi.abi,
-        functionName: 'yesToken',
-      }),
-      publicClient.readContract({
-        address: marketAddress as `0x${string}`,
-        abi: marketAbi.abi,
-        functionName: 'noToken',
+        functionName: 'getMarketInfo',
       })
     ]);
+
+    // Extract market info from the returned tuple
+    const [
+      yesPool,
+      noPool,
+      yesSupply,
+      noSupply,
+      yesPrice,
+      noPrice,
+      totalUsdcDeposited,
+      platformFees,
+      resolved,
+      yesWon,
+      frozen
+    ] = marketInfo as [bigint, bigint, bigint, bigint, bigint, bigint, bigint, bigint, boolean, boolean, boolean];
 
     // Calculate duration from current time and end time
     const currentTime = Math.floor(Date.now() / 1000);
@@ -94,8 +97,6 @@ export async function GET(
     // Format the response with string conversion for BigInt values
     const response = {
       market: marketAddress,
-      yesToken: String(yesToken),
-      noToken: String(noToken),
       protocol: String(protocol),
       category: String(category),
       expiry: String(endTime), // Convert BigInt to string
@@ -103,6 +104,12 @@ export async function GET(
       question: String(question),
       exists: true,
       resolved: Boolean(resolved),
+      yesPool: String(yesPool),
+      noPool: String(noPool),
+      yesSupply: String(yesSupply),
+      noSupply: String(noSupply),
+      totalUsdcDeposited: String(totalUsdcDeposited),
+      frozen: Boolean(frozen),
     };
 
     return NextResponse.json(response);

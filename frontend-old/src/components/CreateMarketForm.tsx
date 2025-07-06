@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useWriteContract, useWaitForTransactionReceipt, useReadContract } from 'wagmi';
 import { useRouter } from 'next/navigation';
 import { FACTORY_ADDRESS } from '../lib/wallet';
-import factoryAbi from '../abi/PredictionMarketFactory.json';
+import factoryAbi from '../abi/PredictionMarketFactoryV2.json';
 
 interface CreateMarketFormProps {
   preselectedProtocol?: string;

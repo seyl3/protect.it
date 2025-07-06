@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { useRouter } from 'next/navigation';
 import { FACTORY_ADDRESS } from '../../lib/wallet';
-import factoryAbi from '../../abi/PredictionMarketFactory.json';
+import factoryAbi from '../../abi/PredictionMarketFactoryV2.json';
 import ClientOnly from '../../components/ClientOnly';
 import CreateMarketForm from '../../components/CreateMarketForm';
 import AsciiBackground from '../../components/AsciiBackground';

@@ -6,8 +6,7 @@ import { useAccount, useReadContract, useWriteContract, useWaitForTransactionRec
 import { formatEther, parseEther } from 'viem';
 import { USDC_ADDRESS } from '../../../lib/wallet';
 import { parseUSDC } from '../../../lib/usdcUtils';
-import predictionMarketAbi from '../../../abi/PredictionMarket.json';
-import predictionTokenAbi from '../../../abi/PredictionToken.json';
+import predictionMarketAbi from '../../../abi/PredictionMarketV2.json';
 import mockUsdcAbi from '../../../abi/MockUSDC.json';
 import ContractStyleTrading from '../../../components/ContractStyleTrading';
 import ClientOnly from '../../../components/ClientOnly';
@@ -15,8 +14,6 @@ import AsciiBackground from '../../../components/AsciiBackground';
 
 interface MarketInfo {
   market: string;
-  yesToken: string;
-  noToken: string;
   protocol: string;
   category: string;
   expiry: string;
@@ -24,6 +21,7 @@ interface MarketInfo {
   question: string;
   exists: boolean;
   resolved: boolean;
+  frozen?: boolean;
 }
 
 // Transaction info component
@@ -161,22 +159,17 @@ function MarketPageContent() {
     }
   }, [marketAddress]);
 
-  // Keep the wagmi calls for trading functionality, but remove the non-existent functions
-  const { data: yesBalance } = useReadContract({
-    address: marketInfo?.yesToken as `0x${string}`,
-    abi: predictionTokenAbi.abi,
-    functionName: 'balanceOf',
+  // Read user position using V2 getUserPosition function
+  const { data: userPosition } = useReadContract({
+    address: marketAddress as `0x${string}`,
+    abi: predictionMarketAbi.abi,
+    functionName: 'getUserPosition',
     args: [address],
-    query: { enabled: !!marketInfo?.yesToken && !!address }
+    query: { enabled: !!address }
   });
 
-  const { data: noBalance } = useReadContract({
-    address: marketInfo?.noToken as `0x${string}`,
-    abi: predictionTokenAbi.abi,
-    functionName: 'balanceOf',
-    args: [address],
-    query: { enabled: !!marketInfo?.noToken && !!address }
-  });
+  const yesBalance = userPosition ? (userPosition as [bigint, bigint, bigint])[0] : BigInt(0);
+  const noBalance = userPosition ? (userPosition as [bigint, bigint, bigint])[1] : BigInt(0);
 
   // Read USDC balance and allowance
   const { data: usdcBalance } = useReadContract({
@@ -225,12 +218,12 @@ function MarketPageContent() {
     if (!amount) return;
     
     try {
-              await writeApprove({
-          address: USDC_ADDRESS,
-          abi: mockUsdcAbi.abi,
-          functionName: 'approve',
+      await writeApprove({
+        address: USDC_ADDRESS,
+        abi: mockUsdcAbi.abi,
+        functionName: 'approve',
           args: [marketAddress as `0x${string}`, parseUSDC(amount)],
-        });
+      });
     } catch (err) {
       console.error('Error approving USDC:', err);
     }
@@ -287,11 +280,11 @@ function MarketPageContent() {
         <div className="text-center mb-8">
           <h1 className="font-faith text-6xl font-bold text-black mb-4">
             {marketInfo?.protocol ? `${marketInfo.protocol} Insurance Market` : 'Loading Market...'}
-          </h1>
+                </h1>
           <p className="text-gray-600 text-lg">
             Decentralized smart contract insurance trading
-          </p>
-        </div>
+                </p>
+              </div>
 
         {isLoadingMarket ? (
           <div className="text-center py-12">
@@ -307,10 +300,10 @@ function MarketPageContent() {
         ) : (
           <div className="text-center py-12">
             <p className="text-red-600 text-lg">Market not found or failed to load</p>
-          </div>
-        )}
-      </div>
-    </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
   );
 }
 
