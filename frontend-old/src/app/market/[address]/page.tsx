@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { formatEther, parseEther } from 'viem';
 import { USDC_ADDRESS } from '../../../lib/wallet';
+import { parseUSDC } from '../../../lib/usdcUtils';
 import predictionMarketAbi from '../../../abi/PredictionMarket.json';
 import predictionTokenAbi from '../../../abi/PredictionToken.json';
 import mockUsdcAbi from '../../../abi/MockUSDC.json';
@@ -108,7 +109,7 @@ function TransactionInfo({
   );
 }
 
-export default function MarketPage() {
+function MarketPageContent() {
   const params = useParams();
   const { address } = useAccount();
   const [activeTab, setActiveTab] = useState<'trade' | 'positions' | 'info'>('trade');
@@ -215,8 +216,8 @@ export default function MarketPage() {
   // Check if approval is needed
   useEffect(() => {
     if (usdcAllowance && amount) {
-      const amountWei = parseEther(amount);
-      setNeedsApproval(BigInt(usdcAllowance as string) < amountWei);
+      const amountUsdc = parseUSDC(amount);
+      setNeedsApproval(BigInt(usdcAllowance as string) < amountUsdc);
     }
   }, [usdcAllowance, amount]);
 
@@ -228,7 +229,7 @@ export default function MarketPage() {
           address: USDC_ADDRESS,
           abi: mockUsdcAbi.abi,
           functionName: 'approve',
-          args: [marketAddress as `0x${string}`, parseEther(amount)],
+          args: [marketAddress as `0x${string}`, parseUSDC(amount)],
         });
     } catch (err) {
       console.error('Error approving USDC:', err);
@@ -244,14 +245,14 @@ export default function MarketPage() {
           address: marketAddress as `0x${string}`,
           abi: predictionMarketAbi.abi,
           functionName: tokenType === 'yes' ? 'buyYes' : 'buyNo',
-          args: [parseEther(amount)],
+          args: [parseUSDC(amount)],
         });
       } else {
         await writeTrade({
           address: marketAddress as `0x${string}`,
           abi: predictionMarketAbi.abi,
           functionName: tokenType === 'yes' ? 'sellYes' : 'sellNo',
-          args: [parseEther(amount)],
+          args: [parseUSDC(amount)],
         });
       }
     } catch (err) {
@@ -279,6 +280,42 @@ export default function MarketPage() {
   const isExpired = marketInfo?.expiry ? Number(marketInfo.expiry) * 1000 < Date.now() : false;
 
   return (
+    <div className="min-h-screen bg-gray-50 py-8 relative">
+      <AsciiBackground />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="font-faith text-6xl font-bold text-black mb-4">
+            {marketInfo?.protocol ? `${marketInfo.protocol} Insurance Market` : 'Loading Market...'}
+          </h1>
+          <p className="text-gray-600 text-lg">
+            Decentralized smart contract insurance trading
+          </p>
+        </div>
+
+        {isLoadingMarket ? (
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00FA9A] mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading market details...</p>
+          </div>
+        ) : marketInfo ? (
+          <ContractStyleTrading 
+            marketAddress={marketAddress}
+            marketInfo={marketInfo}
+            initialAction={initialAction}
+          />
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-red-600 text-lg">Market not found or failed to load</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default function MarketPage() {
+  return (
     <ClientOnly fallback={
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -287,37 +324,7 @@ export default function MarketPage() {
         </div>
       </div>
     }>
-      <div className="min-h-screen bg-gray-50 py-8 relative">
-        <AsciiBackground />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="font-faith text-6xl font-bold text-black mb-4">
-              {marketInfo?.protocol ? `${marketInfo.protocol} Insurance Market` : 'Loading Market...'}
-            </h1>
-            <p className="text-gray-600 text-lg">
-              Decentralized smart contract insurance trading
-            </p>
-          </div>
-
-          {isLoadingMarket ? (
-            <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00FA9A] mx-auto"></div>
-              <p className="mt-4 text-gray-600">Loading market details...</p>
-            </div>
-          ) : marketInfo ? (
-            <ContractStyleTrading 
-              marketAddress={marketAddress}
-              marketInfo={marketInfo}
-              initialAction={initialAction}
-            />
-          ) : (
-            <div className="text-center py-12">
-              <p className="text-red-600 text-lg">Market not found or failed to load</p>
-            </div>
-          )}
-        </div>
-      </div>
+      <MarketPageContent />
     </ClientOnly>
   );
 } 

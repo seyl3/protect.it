@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { formatEther, parseEther } from 'viem';
 import { USDC_ADDRESS } from '../lib/wallet';
+import { parseUSDC, formatUSDC } from '../lib/usdcUtils';
 import predictionMarketAbi from '../abi/PredictionMarket.json';
 import predictionTokenAbi from '../abi/PredictionToken.json';
 import mockUsdcAbi from '../abi/MockUSDC.json';
@@ -89,8 +90,8 @@ export default function ContractStyleTrading({ marketAddress, marketInfo, initia
   // Check if approval is needed
   useEffect(() => {
     if (usdcAllowance && amount) {
-      const amountWei = parseEther(amount);
-      setNeedsApproval((usdcAllowance as bigint) < amountWei);
+      const amountUsdc = parseUSDC(amount);
+      setNeedsApproval((usdcAllowance as bigint) < amountUsdc);
     }
   }, [usdcAllowance, amount]);
 
@@ -102,7 +103,7 @@ export default function ContractStyleTrading({ marketAddress, marketInfo, initia
         address: USDC_ADDRESS,
         abi: mockUsdcAbi.abi,
         functionName: 'approve',
-        args: [marketAddress as `0x${string}`, parseEther(amount)],
+        args: [marketAddress as `0x${string}`, parseUSDC(amount)],
       });
     } catch (err) {
       console.error('Error approving USDC:', err);
@@ -118,14 +119,14 @@ export default function ContractStyleTrading({ marketAddress, marketInfo, initia
           address: marketAddress as `0x${string}`,
           abi: predictionMarketAbi.abi,
           functionName: tokenType === 'yes' ? 'buyYes' : 'buyNo',
-          args: [parseEther(amount)],
+          args: [parseUSDC(amount)],
         });
       } else {
         await writeTrade({
           address: marketAddress as `0x${string}`,
           abi: predictionMarketAbi.abi,
           functionName: tokenType === 'yes' ? 'sellYes' : 'sellNo',
-          args: [parseEther(amount)],
+          args: [parseUSDC(amount)],
         });
       }
     } catch (err) {
@@ -273,7 +274,7 @@ export default function ContractStyleTrading({ marketAddress, marketInfo, initia
                 </div>
                 
                 <p className="text-sm text-gray-600 mt-2">
-                  Available Balance: <span className="text-black font-mono">{usdcBalance ? formatEther(usdcBalance as bigint) : '0'} USDC</span>
+                  Available Balance: <span className="text-black font-mono">{usdcBalance ? formatUSDC(usdcBalance as bigint) : '0'} USDC</span>
                 </p>
               </div>
             </div>
