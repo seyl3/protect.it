@@ -25,6 +25,15 @@ contract CrossChainFlowTest is Test {
     address public constant ALICE = address(0x1);
     address public constant BOB = address(0x2);
     
+    event MessageSent(
+        uint16 indexed dstChainId,
+        address indexed destination,
+        bytes payload,
+        address payable refundAddress,
+        address zroPaymentAddress,
+        bytes adapterParams
+    );
+    
     function setUp() public {
         // Déployer les contrats
         usdc = new MockUSDC();
@@ -195,23 +204,35 @@ contract CrossChainFlowTest is Test {
     
     function test_MarketCreationAndQueryFlow() public {
         // Setup event expectations
+        bytes32 expectedQueryId = keccak256(abi.encodePacked(
+            "KiffyPunch",
+            block.timestamp,
+            block.timestamp + (30 * 1 days)
+        ));
+
+        // Configure bridge to accept messages from watcher
+        bridge.setTrustedRemote(1, abi.encodePacked(address(watcher)));
+        
+        // Alice creates a market and sends query
+        vm.startPrank(ALICE);
+        vm.deal(ALICE, 1 ether); // Give ALICE some ETH for LayerZero fees
+
+        // Send query to watcher which will bridge it to UMA
         vm.expectEmit(true, true, true, true);
         emit MessageSent(
             1, // UMA chain ID
-            address(bridge), // destination
+            watcher.trustedUMAReceiver(), // destination
             abi.encode(
+                expectedQueryId,
                 "KiffyPunch",
                 block.timestamp,
                 block.timestamp + (30 * 1 days)
             ),
-            payable(address(watcher)),
+            payable(ALICE), // refund to ALICE who paid for the tx
             address(0),
             bytes("")
         );
-
-        // Alice creates a market and sends query
-        vm.startPrank(ALICE);
-        vm.deal(ALICE, 1 ether); // Give ALICE some ETH for LayerZero fees
+        watcher.sendQuery{value: 0.1 ether}("KiffyPunch", 30);
 
         // Deploy market
         (address marketAddress, address yesToken, address noToken) = factory.deployMarket(
@@ -219,46 +240,56 @@ contract CrossChainFlowTest is Test {
             30
         );
         market = PredictionMarket(marketAddress);
-
-        // Send query to watcher which will bridge it to UMA
-        bytes32 expectedQueryId = keccak256(abi.encodePacked(
-            "KiffyPunch",
-            uint256(1), // startTime
-            uint256(block.timestamp + (30 * 1 days)) // endTime
-        ));
-        watcher.sendQuery{value: 0.1 ether}("KiffyPunch", 30);
         vm.stopPrank();
 
         // Verify market was created correctly
         assertEq(market.protocolName(), "KiffyPunch");
         assertEq(market.endTime(), block.timestamp + (30 * 1 days));
         assertFalse(market.resolved());
+        assertEq(address(market.oracle()), address(watcher));
 
         // Verify query was stored in watcher
         (
-            string memory protocol,
+            bool exists,
             bool isResolved,
             bool hackConfirmed,
+            string memory protocol,
             uint256 startTime,
             uint256 endTime,
-            address marketAddr,
-            
+            bytes32 marketId
         ) = watcher.getQueryStatus(expectedQueryId);
 
+        assertTrue(exists);
         assertEq(protocol, "KiffyPunch");
         assertFalse(isResolved);
         assertFalse(hackConfirmed);
-        assertEq(marketAddr, marketAddress);
         assertEq(endTime, block.timestamp + (30 * 1 days));
-
-        // Simulate UMA receiving the query through LayerZero
-        vm.startPrank(address(lzEndpoint));
-        bytes memory bridgePayload = abi.encode(expectedQueryId, false); // UMA hasn't processed yet
-        watcher.lzReceive(1, abi.encodePacked(address(bridge)), 0, bridgePayload);
-        vm.stopPrank();
 
         // Verify market is still unresolved (waiting for UMA)
         assertFalse(market.resolved());
+
+        // Warp to after market end time
+        vm.warp(block.timestamp + (30 * 1 days) + 1);
+
+        // Simulate UMA responding with "no hack"
+        vm.startPrank(address(lzEndpoint));
+        bytes memory bridgePayload = abi.encode(expectedQueryId, false); // No hack detected
+        watcher.lzReceive(1, abi.encodePacked(address(bridge)), 0, bridgePayload);
+        vm.stopPrank();
+
+        // Verify market is resolved with "no hack" result
+        assertTrue(market.resolved());
+        (
+            bool exists2,
+            bool isResolved2,
+            bool hackConfirmed2,
+            string memory protocol2,
+            uint256 startTime2,
+            uint256 endTime2,
+            bytes32 marketId2
+        ) = watcher.getQueryStatus(expectedQueryId);
+        assertTrue(isResolved2);
+        assertFalse(hackConfirmed2);
     }
     
     // Fonctions mock pour LayerZero
