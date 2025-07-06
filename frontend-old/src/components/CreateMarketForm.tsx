@@ -6,10 +6,15 @@ import { useRouter } from 'next/navigation';
 import { FACTORY_ADDRESS } from '../lib/wallet';
 import factoryAbi from '../abi/PredictionMarketFactory.json';
 
-export default function CreateMarketForm() {
+interface CreateMarketFormProps {
+  preselectedProtocol?: string;
+  preselectedDuration?: string;
+}
+
+export default function CreateMarketForm({ preselectedProtocol = '', preselectedDuration = '' }: CreateMarketFormProps = {}) {
   const router = useRouter();
-  const [protocol, setProtocol] = useState('');
-  const [duration, setDuration] = useState<number>(30);
+  const [protocol, setProtocol] = useState(preselectedProtocol || '');
+  const [duration, setDuration] = useState<number>(preselectedDuration ? parseInt(preselectedDuration) : 30);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [transactionError, setTransactionError] = useState<Error | null>(null);
   const [deployedMarketAddress, setDeployedMarketAddress] = useState<string | null>(null);

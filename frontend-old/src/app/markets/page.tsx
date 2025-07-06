@@ -6,6 +6,7 @@ import { createPublicClient, http } from 'viem';
 import { defineChain } from 'viem';
 import { FACTORY_ADDRESS } from '../../lib/wallet';
 import factoryAbi from '../../abi/PredictionMarketFactory.json';
+import AsciiBackground from '../../components/AsciiBackground';
 
 // Define Flow EVM Mainnet
 const flowEVM = defineChain({
@@ -166,8 +167,9 @@ export default function MarketsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white text-black">
-      <div className="max-w-7xl mx-auto px-4 py-8">
+    <div className="min-h-screen bg-white text-black relative">
+      <AsciiBackground />
+      <div className="max-w-7xl mx-auto px-4 py-8 relative z-10">
         {/* Header with Filters */}
         <div className="flex justify-between items-center mb-8">
           <div className="flex items-center space-x-4">

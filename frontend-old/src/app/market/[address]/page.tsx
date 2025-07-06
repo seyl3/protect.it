@@ -10,6 +10,7 @@ import predictionTokenAbi from '../../../abi/PredictionToken.json';
 import mockUsdcAbi from '../../../abi/MockUSDC.json';
 import ContractStyleTrading from '../../../components/ContractStyleTrading';
 import ClientOnly from '../../../components/ClientOnly';
+import AsciiBackground from '../../../components/AsciiBackground';
 
 interface MarketInfo {
   market: string;
@@ -274,8 +275,9 @@ export default function MarketPage() {
         </div>
       </div>
     }>
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-gray-50 py-8 relative">
+        <AsciiBackground />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           {/* Header */}
           <div className="text-center mb-8">
             <h1 className="font-faith text-6xl font-bold text-black mb-4">
