@@ -118,8 +118,20 @@ export default function MarketPage() {
   const [needsApproval, setNeedsApproval] = useState(false);
   const [marketInfo, setMarketInfo] = useState<MarketInfo | null>(null);
   const [isLoadingMarket, setIsLoadingMarket] = useState(true);
+  const [initialAction, setInitialAction] = useState<'insure' | 'secure' | undefined>();
 
   const marketAddress = params.address as string;
+
+  // Extract action from URL parameters
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const action = urlParams.get('action');
+      if (action === 'insure' || action === 'secure') {
+        setInitialAction(action);
+      }
+    }
+  }, []);
 
   // Fetch market info from our API
   useEffect(() => {
@@ -204,7 +216,7 @@ export default function MarketPage() {
   useEffect(() => {
     if (usdcAllowance && amount) {
       const amountWei = parseEther(amount);
-      setNeedsApproval(BigInt(usdcAllowance) < amountWei);
+      setNeedsApproval(BigInt(usdcAllowance as string) < amountWei);
     }
   }, [usdcAllowance, amount]);
 
@@ -212,12 +224,12 @@ export default function MarketPage() {
     if (!amount) return;
     
     try {
-      await writeApprove({
-        address: USDC_ADDRESS,
-        abi: mockUsdcAbi.abi,
-        functionName: 'approve',
-        args: [marketAddress, parseEther(amount)],
-      });
+              await writeApprove({
+          address: USDC_ADDRESS,
+          abi: mockUsdcAbi.abi,
+          functionName: 'approve',
+          args: [marketAddress as `0x${string}`, parseEther(amount)],
+        });
     } catch (err) {
       console.error('Error approving USDC:', err);
     }
@@ -229,14 +241,14 @@ export default function MarketPage() {
     try {
       if (tradeType === 'buy') {
         await writeTrade({
-          address: marketAddress,
+          address: marketAddress as `0x${string}`,
           abi: predictionMarketAbi.abi,
           functionName: tokenType === 'yes' ? 'buyYes' : 'buyNo',
           args: [parseEther(amount)],
         });
       } else {
         await writeTrade({
-          address: marketAddress,
+          address: marketAddress as `0x${string}`,
           abi: predictionMarketAbi.abi,
           functionName: tokenType === 'yes' ? 'sellYes' : 'sellNo',
           args: [parseEther(amount)],
@@ -250,7 +262,7 @@ export default function MarketPage() {
   const handleClaim = async () => {
     try {
       await writeClaim({
-        address: marketAddress,
+        address: marketAddress as `0x${string}`,
         abi: predictionMarketAbi.abi,
         functionName: 'claimWinnings',
         args: [],
@@ -297,6 +309,7 @@ export default function MarketPage() {
             <ContractStyleTrading 
               marketAddress={marketAddress}
               marketInfo={marketInfo}
+              initialAction={initialAction}
             />
           ) : (
             <div className="text-center py-12">

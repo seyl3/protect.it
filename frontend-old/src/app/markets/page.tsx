@@ -252,7 +252,7 @@ export default function MarketsPage() {
                   {/* Action Buttons */}
                   <div className="flex space-x-3">
                     <Link
-                      href={`/market/${market.market}`}
+                      href={`/market/${market.market}?action=insure`}
                       className={`flex-1 py-3 px-4 rounded-lg font-bold text-center transition-all duration-200 transform ${
                         marketData.canInsure
                           ? 'bg-[#00FA9A] text-black hover:bg-[#00FA9A]/80 hover:scale-105 hover:shadow-lg'
@@ -262,7 +262,7 @@ export default function MarketsPage() {
                       Insure
                     </Link>
                     <Link
-                      href={`/market/${market.market}`}
+                      href={`/market/${market.market}?action=secure`}
                       className="flex-1 py-3 px-4 rounded-lg font-bold text-center bg-gray-300 text-black hover:bg-gray-400 transition-all duration-200 transform hover:scale-105 hover:shadow-lg"
                     >
                       Secure

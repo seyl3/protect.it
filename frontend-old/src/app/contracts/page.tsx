@@ -31,7 +31,7 @@ export default function ContractsPage() {
         
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Smart Contracts</h1>
+          <h1 className="font-faith text-6xl font-bold text-black">Smart Contracts</h1>
           <p className="mt-2 text-gray-600">
             Core contracts powering the Protect.it insurance protocol on Flow EVM.
           </p>

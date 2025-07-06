@@ -18,14 +18,27 @@ interface ContractStyleTradingProps {
     noToken: string;
     resolved: boolean;
   } | null;
+  initialAction?: 'insure' | 'secure';
 }
 
-export default function ContractStyleTrading({ marketAddress, marketInfo }: ContractStyleTradingProps) {
+export default function ContractStyleTrading({ marketAddress, marketInfo, initialAction }: ContractStyleTradingProps) {
   const { address } = useAccount();
   const [tradeType, setTradeType] = useState<'buy' | 'sell'>('buy');
   const [tokenType, setTokenType] = useState<'yes' | 'no'>('yes');
   const [amount, setAmount] = useState('');
   const [needsApproval, setNeedsApproval] = useState(false);
+
+  // Set default values based on initial action
+  useEffect(() => {
+    if (initialAction) {
+      setTradeType('buy');
+      if (initialAction === 'insure') {
+        setTokenType('yes');
+      } else if (initialAction === 'secure') {
+        setTokenType('no');
+      }
+    }
+  }, [initialAction]);
 
   // Read balances
   const { data: yesBalance } = useReadContract({
@@ -242,6 +255,23 @@ export default function ContractStyleTrading({ marketAddress, marketInfo }: Cont
                   placeholder="0.00"
                   className="w-full text-2xl font-mono p-3 bg-white border border-gray-300 rounded-lg text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-300"
                 />
+                
+                {/* Quick Amount Buttons */}
+                <div className="mt-3 mb-2">
+                  <p className="text-sm font-bold text-black mb-2">Quick Amounts:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {[10, 50, 100, 1000, 10000].map((quickAmount) => (
+                      <button
+                        key={quickAmount}
+                        onClick={() => setAmount(quickAmount.toString())}
+                        className="px-3 py-1 bg-white border border-gray-300 rounded-lg text-sm font-mono text-black hover:border-[#00FA9A] hover:bg-[#00FA9A]/10 transition-all duration-200 transform hover:scale-105"
+                      >
+                        {quickAmount >= 1000 ? `${quickAmount / 1000}K` : quickAmount}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                
                 <p className="text-sm text-gray-600 mt-2">
                   Available Balance: <span className="text-black font-mono">{usdcBalance ? formatEther(usdcBalance as bigint) : '0'} USDC</span>
                 </p>

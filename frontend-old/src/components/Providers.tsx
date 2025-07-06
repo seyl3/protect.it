@@ -41,12 +41,14 @@ function ConnectWalletButton() {
     
     return (
       <div className="flex items-center gap-3">
-        <span className="text-sm font-medium text-black">
-          {displayName}
-        </span>
+        <div className="relative">
+          <span className="text-sm font-medium text-black bg-white px-3 py-1.5 rounded-lg border-2 border-[#00FA9A]">
+            {displayName}
+          </span>
+        </div>
         <button
           onClick={logout}
-          className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition font-medium"
+          className="px-2 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600 transition font-medium"
         >
           Logout
         </button>
