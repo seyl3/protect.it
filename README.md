@@ -14,6 +14,5 @@ _Example 1 :_ **Ankr** DAO, TWAP’s 5M$ worth of insurance (buying “yes hack�
 
 _Example 2 :_ An insider knows that **KittyPunch** succesfully passed a smart contract audit They take a heavy position *agains* the event “**KittyPunch** will be hacked.”, allowing prediction markets to have an edge and reach equilibrium.
 
-## Tech stack :
-
-
+## Try it out :
+https://protect-it.vercel.app
